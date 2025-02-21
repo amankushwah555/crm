@@ -1,5 +1,8 @@
 import { RegisterFormData } from "./pages/Register";
 // import {HotelType} from "../../backend/src/models/hotel"
+interface Message {
+    msg: string;
+  }
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 export const register = async (formData: RegisterFormData) => {
     const response = await fetch(`${API_BASE_URL}/api/users/register`, {
@@ -19,7 +22,7 @@ export const register = async (formData: RegisterFormData) => {
         // Ensure the error message is a string
         const errorMessage = responseBody.message 
             ? Array.isArray(responseBody.message) 
-                ? responseBody.message.map(msg => msg.msg).join(", ") // Join array of messages
+                ? responseBody.message.map((msg: Message) => msg.msg).join(", ") // Join array of messages
                 : responseBody.message
             : "An unknown error occurred";
 

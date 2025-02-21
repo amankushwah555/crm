@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import fullLogog from "../assets/fulllogo.png"
 
 const Header = () => {
