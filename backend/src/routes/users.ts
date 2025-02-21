@@ -1,8 +1,9 @@
 import express, {Request, Response} from "express";
 import User from "../models/user";
-import jwt from "jsonwebtoken";
 import {check, validationResult} from "express-validator"
 import nodemailer from 'nodemailer';
+import fs from "fs";
+import path from "path";
 
 const router = express.Router();
 
@@ -45,21 +46,29 @@ router.post('/register', [
 
 // Function to send email
 const sendGreetingEmail = async (email: string, name: string) => {
-    // Configure nodemailer transporter
-    const transporter = nodemailer.createTransport({
-        service: 'gmail', // or use SMTP settings
-        auth: {
-            user: process.env.SMTP_USER, // Your email (store in env variable)
-            pass: process.env.SMTP_PASS  // Your email password (store in env variable)
-        }
-    });
+  try {
+      // ✅ Read the HTML file from the root directory
+      const emailTemplatePath = path.join(__dirname, "../../one.html");
+      const emailHtml = fs.readFileSync(emailTemplatePath, "utf8");
 
-    // Email template
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Is Your Business Secure? Find Out in 60 Seconds! 🚀",
-        html: `<!DOCTYPE html>
+      // ✅ Replace placeholders (if needed)
+      const personalizedHtml = emailHtml.replace("{{name}}", name);
+
+      // ✅ Configure the nodemailer transporter
+      const transporter = nodemailer.createTransport({
+          service: 'gmail', // Or use SMTP settings
+          auth: {
+              user: process.env.SMTP_USER,
+              pass: process.env.SMTP_PASS
+          }
+      });
+
+      // ✅ Mail options
+      const mailOptions = {
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: "Welcome to C9lab Pinak Infosec Pvt. Ltd.! 🚀",
+          html: `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -68,95 +77,93 @@ const sendGreetingEmail = async (email: string, name: string) => {
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            padding: 20px;
-            color: #333;
+            margin: 0;
+            padding: 0;
         }
         .container {
             max-width: 600px;
-            margin: auto;
-            background: #ffffff;
+            margin: 20px auto;
+            background-color: #ffffff;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
         h2 {
-            color: #1a1a1a;
+            color: #333333;
         }
-        a {
-            color: #0073e6;
-            text-decoration: none;
+        p {
+            font-size: 16px;
+            color: #555555;
+            line-height: 1.6;
+        }
+        .signature {
+            margin-top: 20px;
             font-weight: bold;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 15px;
-            color: #ffffff;
-            background-color: #0073e6;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-top: 10px;
-        }
-        .btn:hover {
-            background-color: #005bb5;
-        }
-        .section {
-            margin-bottom: 20px;
+            color: #333333;
         }
         .footer {
             margin-top: 20px;
-            font-size: 12px;
+            font-size: 14px;
+            color: #777777;
             text-align: center;
-            color: #777;
         }
+      .btn {
+    display: inline-block;
+    background-color: orange;
+    color: #ffffff!important; /* Use this property for white text */
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background-color: rgb(245, 151, 9);
+}
+
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h2>Hi ${name},</h2>
-        <p>🔎 <strong>Did you know that 60% of businesses close within 6 months of a cyberattack?</strong> Yet, most don’t realize their vulnerabilities until it’s too late. <strong>What about your business?</strong></p>
-        <p>At <strong>C9Lab</strong>, we specialize in <strong>AI-driven cybersecurity solutions</strong> that <strong>prevent attacks before they happen</strong>—because <strong>reactive security is already too late.</strong></p>
-        
-        <div class="section">
-            <h3>🔥 What’s Keeping Businesses Safe?</h3>
-            <p>✅ <strong>QSafe – Brand Protection</strong><br>Stop <strong>brand impersonation, fake domains, and social media scams</strong> before they damage your reputation.</p>
-            <p>✅ <strong>C9Phish – AI-Powered Phishing Defense</strong><br>Train your employees to <strong>identify real cyber threats</strong> with <strong>simulated phishing campaigns</strong> & interactive security lessons.</p>
-            <p>✅ <strong>C9Pharos – Website Security & Performance Monitoring</strong><br>Get <strong>instant alerts for downtime, SSL issues, malware, and data leaks</strong>—so you’re always in control.</p>
-            <p>✅ <strong>C9Lab 360 – Secure Remote Access</strong><br>High-performance <strong>remote desktop security</strong> that keeps your team connected—without exposing sensitive data.</p>
-        </div>
-        
-        <div class="section">
-            <h3>🔍 Find Out How Secure Your Business Is (For Free!)</h3>
-            <p>We built a <strong>FREE Business Risk Score Checker</strong> to help you understand where your business stands. In just <strong>60 seconds</strong>, you’ll get a <strong>security assessment</strong>—and insights on how to improve.</p>
-            <a href="https://brs.c9lab.com/" class="btn">Check Your Business Risk Score Now</a>
-        </div>
-        
-        <div class="section">
-            <h3>🛡️ Protect Your Business—Anytime, Anywhere!</h3>
-            <p>Monitor your website’s security <strong>on the go</strong> with <strong>C9Pharos</strong>—available for <strong>Android & iOS.</strong></p>
-            <p>📲 <a href="#">Download for Android</a></p>
-            <p>📲 <a href="#">Download for iOS</a></p>
-        </div>
-        
-        <div class="section">
-            <h3>⚡ Take Action Before Hackers Do!</h3>
-            <p>Hundreds of businesses are already strengthening their defenses with <strong>C9Lab</strong>. <strong>Are you next?</strong></p>
-            <p>📩 <strong>Let’s talk.</strong> Reply to this email or <a href="#">schedule a consultation</a> today.</p>
-        </div>
-        
-        <p>Stay Secure,<br><strong>C9Lab</strong></p>
-        
+        <h2>Dear ${name},</h2>
+
+        <p>
+            It was a pleasure meeting you at the <strong>Global Investors Summit 2025</strong>. 
+            We appreciate your time and interest in connecting with us.
+        </p>
+
+        <p>
+            Looking forward to staying in touch and exploring future opportunities together. 
+            Feel free to reach out anytime!
+        </p>
+
+        <p class="signature">
+            Best Regards,<br>
+            Prasoon Upadhyay<br>
+            Sales Head<br>
+            <strong>C9Lab | Pinak Infosec Pvt. Ltd.</strong><br>
+            <a href="mailto:prasoon.upadhyay@pinakinfosec.com" style="color: #007bff;">Email: prasoon.upadhyay@pinakinfosec.com</a><br>
+            <a href="https://c9lab.com" target="_blank" class="btn">Visit Our Website</a>
+        </p>
+
         <div class="footer">
-            <p>© 2025 C9Lab. All rights reserved.</p>
+            &copy; 2025 C9Lab Pinak Infosec Pvt. Ltd. | All Rights Reserved.
         </div>
     </div>
+
 </body>
 </html>
-`
-    };
+`,  // ✅ Inject HTML content from file
+      };
 
-    // Send email
-    await transporter.sendMail(mailOptions);
+      // ✅ Send email
+      await transporter.sendMail(mailOptions);
+      console.log(`Email sent successfully to ${email}`);
+  } catch (error) {
+      console.error("Error sending email:", error);
+  }
 };
-
 
 export default router;
