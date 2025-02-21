@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.img-remove-bg {
+    mix-blend-mode: darken;
+    filter: brightness(1.3);
+  }
+
+  
+/* 
+   .img-remove-bg {
+    mix-blend-mode: darken;
+  }
+   */
