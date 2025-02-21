@@ -38,6 +38,7 @@ app.get("*", (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'))
 })
 
-app.listen(7000, () => {
-    console.log("Server is running on port 7000");
-})
+const PORT = process.env.PORT || 7000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
