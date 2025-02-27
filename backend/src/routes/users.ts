@@ -4,16 +4,17 @@ import {check, validationResult} from "express-validator"
 import nodemailer from 'nodemailer';
 import fs from "fs";
 import path from "path";
+import ExcelJS from "exceljs";
 
 const router = express.Router();
 
 
 router.post('/register', [
     check('name', 'Please enter a name').isString(),
-    check('email', 'Please enter a valid email').isEmail(),
-    check('phone', 'Please enter a valid phone number').isString(),
-    check('company_name', 'Please enter a valid company name').isString(),
-    check('designation', 'Please enter a valid designation').isString(),
+    // check('email', 'Please enter a valid email').isEmail(),
+    // check('phone', 'Please enter a valid phone number').isString(),
+    // check('company_name', 'Please enter a valid company name').isString(),
+    // check('designation', 'Please enter a valid designation').isString(),
 ], async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -165,5 +166,53 @@ const sendGreetingEmail = async (email: string, name: string) => {
       console.error("Error sending email:", error);
   }
 };
+
+
+router.get("/export-excel", async (req: Request, res: Response) => {
+    try {
+        // Fetch users from MongoDB
+        const users = await User.find();
+
+        if (users.length === 0) {
+            return res.status(404).json({ message: "No users found to export" });
+        }
+
+        // Create a new workbook and worksheet
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Users");
+
+        // Define columns
+        worksheet.columns = [
+            { header: "Name", key: "name", width: 20 },
+            { header: "Email", key: "email", width: 30 },
+            { header: "Phone", key: "phone", width: 15 },
+            { header: "Company Name", key: "company_name", width: 25 },
+            { header: "Designation", key: "designation", width: 25 },
+        ];
+
+        // Add rows to the worksheet
+        users.forEach((user) => {
+            worksheet.addRow(user.toObject());
+        });
+
+        // Set the response headers for file download
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader(
+            "Content-Disposition",
+            "attachment; filename=users.xlsx"
+        );
+
+        // Write to response
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        console.error("Error exporting users to Excel:", error);
+        res.status(500).json({ message: "Failed to export data" });
+    }
+});
+
 
 export default router;
