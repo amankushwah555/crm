@@ -22,7 +22,7 @@ router.post('/register', [
     }
 
     try {
-        let user = await User.findOne({ email: req.body.email });
+        let user = await User.findOne({ name: req.body.name });
 
         if (user) {
             return res.status(400).json({ message: "User already exists." });
@@ -33,7 +33,9 @@ router.post('/register', [
         await user.save();
 
         // Send greeting email after saving
-        await sendGreetingEmail(req.body.email, req.body.name);
+        if(req.body.email){
+            await sendGreetingEmail(req.body.email, req.body.name);
+        }
 
         return res.status(200).send({
             message: "User registered successfully! A greeting email has been sent."
