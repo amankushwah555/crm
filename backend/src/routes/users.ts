@@ -68,7 +68,7 @@ const sendGreetingEmail = async (email: string, name: string) => {
 
       // ✅ Mail options
       const mailOptions = {
-          from: process.env.EMAIL_USER,
+          from: process.env.SMTP_USER,
           to: email,
           subject: "Welcome to C9lab Pinak Infosec Pvt. Ltd.! 🚀",
           html: `<!DOCTYPE html>
@@ -133,7 +133,7 @@ const sendGreetingEmail = async (email: string, name: string) => {
         <h2>Dear ${name},</h2>
 
         <p>
-            It was a pleasure meeting you at the <strong>Global Investors Summit 2025</strong>. 
+            It was a pleasure meeting you at the <strong>Startup Mahakumbh 2025</strong>. 
             We appreciate your time and interest in connecting with us.
         </p>
 
@@ -215,6 +215,65 @@ router.get("/export-excel", async (req: Request, res: Response) => {
         res.status(500).json({ message: "Failed to export data" });
     }
 });
+
+
+// const transporter = nodemailer.createTransport({
+//     host: process.env.SMTP_HOST,
+//     port: Number(process.env.SMTP_PORT),
+//     secure: false, // true for 465, false for other ports
+//     auth: {
+//         user: process.env.SMTP_USER,
+//         pass: process.env.SMTP_PASS,
+//     },
+// });
+
+/**
+ * Function to send bulk emails
+ */
+// router.post("/send-bulk-emails", async (req: Request, res: Response) => {
+//     try {
+//         // Read email template from file
+//         const templatePath = path.join(__dirname, "../../one.html");
+//         let emailTemplate = fs.readFileSync(templatePath, "utf8");
+
+//         // Fetch users from MongoDB
+//         // const users = await User.find();
+
+//         // if (users.length === 0) {
+//         //     return res.status(404).json({ message: "No users found to send emails" });
+//         // }
+
+//         // Send emails to each user
+//         // const emailPromises = users.map(async (user) => {
+//         //     // Replace placeholders in the email template
+            
+//         //     console.log(user.email);
+
+          
+
+//         //     // return transporter.sendMail(mailOptions);
+//         // });
+
+//         let personalizedEmail = emailTemplate.replace(/{{name}}/g, "Dr. Shanu Sharma");
+//         const mailOptions = {
+//             from: process.env.SMTP_USER,
+//             to: "shanusharma@spabhopal.ac.in",
+//             subject: "Is Your Business Secure? Find Out in 60 Seconds! 🚀",
+//             html: personalizedEmail,
+//         };
+//         await transporter.sendMail(mailOptions);
+
+//        // Wait for all emails to be sent
+//         // await Promise.all(emailPromises);
+
+//         return res.json({ message: "Emails sent successfully!" });
+
+//     } catch (error) {
+//         console.error("Error sending bulk emails:", error);
+//         return res.status(500).json({ message: "Failed to send emails", error });
+//     }
+// });
+
 
 
 export default router;
